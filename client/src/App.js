@@ -6,6 +6,7 @@ function App() {
   const [footName, setFoodName] = useState("");
   const [eatingDays, setEatingDays] = useState(0);
   const [footList, setFoodList] = useState([]);
+  const [newFoodName, setNewFoodName] = useState("");
 
   useEffect(() => {
     axios.get("http://localhost:3001/read").then((response) => {
@@ -18,6 +19,17 @@ function App() {
       foodName: footName,
       eatingDays: eatingDays,
     });
+  };
+
+  const editFoodName = (id) => {
+    axios.put("http://localhost:3001/editFoodName", {
+      id: id,
+      footName: newFoodName,
+    });
+  };
+
+  const deleteFood = (id) => {
+    axios.delete(`http://localhost:3001/deleteFood/${id}`);
   };
 
   return (
@@ -51,8 +63,30 @@ function App() {
 
         {footList.map((val, key) => {
           return (
-            <div key={key}>
+            <div key={key} className="food">
               <h1>{val.foodName}</h1> <h1>{val.eatingDays}</h1>{" "}
+              <input
+                type="text"
+                placeholder="edit food name..."
+                name="newfood"
+                onChange={(event) => {
+                  setNewFoodName(event.target.value);
+                }}
+              />
+              <input
+                type="button"
+                value="Edit"
+                id="edit"
+                onClick={() => editFoodName(val._id)}
+              />
+              <input
+                type="button"
+                value="delete"
+                id="delete"
+                onClick={() => {
+                  deleteFood(val._id);
+                }}
+              />
             </div>
           );
         })}

@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const FoodModel = require("./models/Food");
+const { update } = require("./models/Food");
 
 const app = express();
 
@@ -41,6 +42,28 @@ app.get("/read", async (req, res) => {
 
     res.send(result);
   });
+});
+
+app.put("/editFoodName", async (req, res) => {
+  const id = req.body.id;
+  const newFoodName = req.body.footName;
+
+  try {
+    await FoodModel.findById(id, (err, updatedFood) => {
+      updatedFood.foodName = newFoodName;
+      updatedFood.save();
+      res.send("updated");
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.delete("/deleteFood/:id", async (req, res) => {
+  const id = req.params.id;
+
+  await FoodModel.findByIdAndDelete(id).exec();
+  res.send("deleted");
 });
 
 app.listen(3001, () => {
