@@ -10,12 +10,14 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+
 mongoose.connect(
-  "mongodb+srv://hammad:471754@mern-crud.78v8i5l.mongodb.net/crud?retryWrites=true&w=majority",
+  "mongodb+srv://hammad:B3Aomisf1SDohVrD@cluster0.4itebyb.mongodb.net/Todo?retryWrites=true&w=majority",
   {
     useNewUrlParser: true,
   }
 );
+
 
 app.post("/insert", async (req, res) => {
   const foodName = req.body.foodName;
@@ -28,11 +30,13 @@ app.post("/insert", async (req, res) => {
 
   try {
     await food.save();
-    // res.send("Data inserted");
+    res.send("Data inserted");
   } catch (err) {
     console.log(err);
+    res.status(500).send("Internal Server Error");
   }
 });
+
 
 app.get("/read", async (req, res) => {
   FoodModel.find({}, (err, result) => {
@@ -46,18 +50,25 @@ app.get("/read", async (req, res) => {
 
 app.put("/editFoodName", async (req, res) => {
   const id = req.body.id;
-  const newFoodName = req.body.footName;
+  const newFoodName = req.body.foodName;
 
   try {
-    await FoodModel.findById(id, (err, updatedFood) => {
-      updatedFood.foodName = newFoodName;
-      updatedFood.save();
-      res.send("updated");
-    });
+    const updatedFood = await FoodModel.findById(id);
+
+    if (!updatedFood) {
+      return res.status(404).send("Food not found");
+    }
+
+    updatedFood.foodName = newFoodName;
+    await updatedFood.save();
+
+    res.send("Updated");
   } catch (err) {
     console.log(err);
+    res.status(500).send("Internal Server Error");
   }
 });
+
 
 app.delete("/deleteFood/:id", async (req, res) => {
   const id = req.params.id;
